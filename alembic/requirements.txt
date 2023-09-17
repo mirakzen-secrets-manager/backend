@@ -1,0 +1,4 @@
+alembic
+alembic-utils
+sqlalchemy
+psycopg2-binary

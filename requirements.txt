@@ -1,0 +1,11 @@
+aiofile
+asyncpg
+bcrypt
+fastapi
+passlib[bcrypt]
+psycopg2-binary
+pyotp
+python-jose[cryptography]
+pyyaml
+SQLAlchemy
+uvicorn
