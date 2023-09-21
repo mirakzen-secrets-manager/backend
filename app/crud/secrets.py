@@ -17,36 +17,37 @@ async def create_secrets(
     current_account: CurrentAccount,
     new_secrets: list[secrets_schemas.NewSecret],
 ) -> None:
-    names = [secret.name.lower() for secret in new_secrets]
+    async with session.begin():
+        names = [secret.name.lower() for secret in new_secrets]
 
-    db_secrets = await session.scalars(
-        select(Secrets).where(
-            Secrets.account_id == current_account.id,
-            Secrets.name.in_(names),
-        )
-    )
-    db_names = [secret.name for secret in db_secrets]
-    data_for_insert = []
-    names_for_insert = []
-    for secret in new_secrets:
-        if secret.name.lower() not in db_names:
-            names_for_insert.append(secret.name.lower())
-            data_for_insert.append(
-                {
-                    "account_id": current_account.id,
-                    "name": secret.name.lower(),
-                    "data": jws.sign(
-                        secret.data,
-                        get_secrets_key(cfg.SECRETS_KEY, current_account.id),
-                        algorithm="HS256",
-                    ),
-                }
+        db_secrets = await session.scalars(
+            select(Secrets).where(
+                Secrets.account_id == current_account.id,
+                Secrets.name.in_(names),
             )
+        )
+        db_names = [secret.name for secret in db_secrets]
+        data_for_insert = []
+        names_for_insert = []
+        for secret in new_secrets:
+            if secret.name.lower() not in db_names:
+                names_for_insert.append(secret.name.lower())
+                data_for_insert.append(
+                    {
+                        "account_id": current_account.id,
+                        "name": secret.name.lower(),
+                        "data": jws.sign(
+                            secret.data,
+                            get_secrets_key(cfg.SECRETS_KEY, current_account.id),
+                            algorithm="HS256",
+                        ),
+                    }
+                )
 
-    if not data_for_insert:
-        HTTPabort(409, "Secrets already exist")
-    await session.execute(insert(Secrets).values(data_for_insert))
-    return names_for_insert
+        if not data_for_insert:
+            HTTPabort(409, "Secrets already exist")
+        await session.execute(insert(Secrets).values(data_for_insert))
+        return names_for_insert
 
 
 async def get_secrets(
