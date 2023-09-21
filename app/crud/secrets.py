@@ -19,7 +19,7 @@ async def create_secrets(
 ) -> None:
     names = [secret.name.lower() for secret in new_secrets]
 
-    db_secrets = await session.scalar(
+    db_secrets = await session.scalars(
         select(Secrets).where(
             Secrets.account_id == current_account.id,
             Secrets.name.in_(names),

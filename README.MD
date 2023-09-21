@@ -50,7 +50,7 @@ For development:
 
 Some extras:
 -   Maybe you need to setup Nginx's reverse_proxy
--   QR-code from OTP-link can be created at front-end side, but you can use `qrcode.py` to render it
+-   QR-code from OTP-link can be created at front-end side, but you can use `make_qrcode.py` to render it
 
 
 ## Stack

@@ -379,6 +379,7 @@ async def get_sessions(session: AsyncSession, current_account: CurrentAccount) -
         return {
             str(s.id): {
                 "started": s.started.isoformat() if s.started else s.started,
+                "type": s.type,
                 "current": True if str(current_account.sid) == str(s.id) else False,
             }
             for s in account_sessions
